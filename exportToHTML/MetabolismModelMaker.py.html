@@ -1,0 +1,166 @@
+<html>
+<head>
+<title>MetabolismModelMaker.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #629755; font-style: italic;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #cc7832;}
+.s3 { color: #808080;}
+.s4 { color: #6a8759;}
+.s5 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+MetabolismModelMaker.py</font>
+</center></td></tr></table>
+<pre><span class="s0">&quot;&quot;&quot;Create the GUI which will be able to start up the KGML visualizer&quot;&quot;&quot;</span>
+<span class="s2">import </span><span class="s1">os</span>
+<span class="s2">import </span><span class="s1">sys</span>
+
+<span class="s2">from </span><span class="s1">PySide6.QtWidgets </span><span class="s2">import </span><span class="s1">(QFileDialog</span><span class="s2">,</span>
+                               <span class="s1">QLabel</span><span class="s2">,</span>
+                               <span class="s1">QLineEdit</span><span class="s2">,</span>
+                               <span class="s1">QPushButton</span><span class="s2">,</span>
+                               <span class="s1">QVBoxLayout</span><span class="s2">,</span>
+                               <span class="s1">QWidget</span><span class="s2">,</span>
+                               <span class="s1">QApplication)</span>
+
+<span class="s2">from </span><span class="s1">create_visual </span><span class="s2">import </span><span class="s1">display_kgml</span>
+
+
+<span class="s2">class </span><span class="s1">MyWidget(QWidget):</span>
+    <span class="s0">&quot;&quot;&quot;Define a main GUI&quot;&quot;&quot;</span>
+
+    <span class="s2">def </span><span class="s1">__init__(self):</span>
+        <span class="s1">super().__init__()</span>
+
+        <span class="s3"># Create GUI variables and state</span>
+        <span class="s1">self.kgml_file_name = </span><span class="s4">&quot;&quot;</span>
+        <span class="s1">self.old_kgml_file_name = </span><span class="s4">&quot;&quot;</span>
+        <span class="s1">self.model_file_name = </span><span class="s4">&quot;&quot;</span>
+        <span class="s1">self.setWindowTitle(</span><span class="s4">&quot;KGML Model Creator GUI&quot;</span><span class="s1">)</span>
+
+        <span class="s3"># Set up GUI Components</span>
+        <span class="s1">self.kgml_path_text = QLabel(</span><span class="s4">&quot;KGML Path: --&quot;</span><span class="s1">)</span>
+        <span class="s1">self.model_path_text = QLabel(</span><span class="s4">&quot;Model Path: --&quot;</span><span class="s1">)</span>
+        <span class="s1">self.model_file_text = QLabel(</span><span class="s4">&quot;Generated Model File Name (if generating):&quot;</span><span class="s1">)</span>
+        <span class="s1">self.model_file_edit = QLineEdit(</span><span class="s4">&quot;example-model-file-name&quot;</span><span class="s1">)</span>
+        <span class="s1">self.choose_kgml_file_button = QPushButton(</span><span class="s4">&quot;Choose KGML File (Required)&quot;</span><span class="s1">)</span>
+        <span class="s1">self.choose_model_file_button = QPushButton(</span><span class="s4">&quot;Choose Model File (Optional)&quot;</span><span class="s1">)</span>
+        <span class="s1">self.toggle_generate_model_button = QPushButton(</span><span class="s4">&quot;Toggle Model Generation: currently off&quot;</span><span class="s1">)</span>
+        <span class="s1">self.run_button = QPushButton(</span><span class="s4">&quot;Run Simulation&quot;</span><span class="s1">)</span>
+
+        <span class="s3"># Set Initial State of GUI Components</span>
+        <span class="s1">self.toggle_generate_model_button.setCheckable(</span><span class="s2">True</span><span class="s1">)</span>
+        <span class="s1">self.toggle_generate_model_button.setStyleSheet(</span><span class="s4">&quot;background-color : lightgrey&quot;</span><span class="s1">)</span>
+        <span class="s1">self.choose_kgml_file_button.setStyleSheet(</span><span class="s4">&quot;background-color : rgb(255,105,97)&quot;</span><span class="s1">)</span>
+        <span class="s1">self.choose_model_file_button.setStyleSheet(</span><span class="s4">&quot;background-color : lightgrey&quot;</span><span class="s1">)</span>
+
+        <span class="s3"># Add GUI Components to the full GUI</span>
+        <span class="s1">self.layout = QVBoxLayout(self)</span>
+        <span class="s1">self.layout.addWidget(self.kgml_path_text)</span>
+        <span class="s1">self.layout.addWidget(self.model_path_text)</span>
+        <span class="s1">self.layout.addWidget(self.model_file_text)</span>
+        <span class="s1">self.layout.addWidget(self.model_file_edit)</span>
+        <span class="s1">self.layout.addWidget(self.choose_kgml_file_button)</span>
+        <span class="s1">self.layout.addWidget(self.choose_model_file_button)</span>
+        <span class="s1">self.layout.addWidget(self.toggle_generate_model_button)</span>
+        <span class="s1">self.layout.addWidget(self.run_button)</span>
+
+        <span class="s3"># Make GUI components clickable and assign them to callback functions</span>
+        <span class="s1">self.choose_kgml_file_button.clicked.connect(self.choose_kgml_file)</span>
+        <span class="s1">self.choose_model_file_button.clicked.connect(self.choose_model_file)</span>
+        <span class="s1">self.toggle_generate_model_button.clicked.connect(self.change_gen_model_button_color)</span>
+        <span class="s1">self.run_button.clicked.connect(self.run_display)</span>
+
+    <span class="s2">def </span><span class="s1">change_gen_model_button_color(self):</span>
+        <span class="s0">&quot;&quot;&quot;Change the generate model button color to represent a toggle&quot;&quot;&quot;</span>
+        <span class="s2">if </span><span class="s1">self.toggle_generate_model_button.isChecked():</span>
+            <span class="s3"># Turn the button to an &quot;ON&quot; state</span>
+            <span class="s1">self.toggle_generate_model_button.setStyleSheet(</span><span class="s4">&quot;background-color : lightgreen&quot;</span><span class="s1">)</span>
+            <span class="s1">self.toggle_generate_model_button.setText(</span><span class="s4">&quot;Toggle Model Generation (currently on)&quot;</span><span class="s1">)</span>
+        <span class="s2">else</span><span class="s1">:</span>
+            <span class="s3"># Turn the button to an &quot;OFF&quot; state</span>
+            <span class="s1">self.toggle_generate_model_button.setStyleSheet(</span><span class="s4">&quot;background-color : lightgrey&quot;</span><span class="s1">)</span>
+            <span class="s1">self.toggle_generate_model_button.setText(</span><span class="s4">&quot;Toggle Model Generation (currently off)&quot;</span><span class="s1">)</span>
+
+    <span class="s2">def </span><span class="s1">run_display(self):</span>
+        <span class="s0">&quot;&quot;&quot;Run the visualizer based on data from the GUI for arguments&quot;&quot;&quot;</span>
+        <span class="s2">if </span><span class="s1">self.kgml_file_name != </span><span class="s4">&quot;&quot;</span><span class="s1">:</span>
+            <span class="s3">#  Define file location to save the model in and determine if application is a script file or frozen exe</span>
+            <span class="s1">application_path = </span><span class="s4">&quot;&quot;</span>
+            <span class="s2">if </span><span class="s1">getattr(sys</span><span class="s2">, </span><span class="s4">'frozen'</span><span class="s2">, False</span><span class="s1">):</span>
+                <span class="s1">application_path = os.path.dirname(sys.executable)</span>
+            <span class="s2">elif </span><span class="s1">__file__:</span>
+                <span class="s1">application_path = os.path.dirname(__file__)</span>
+            <span class="s1">generated_model_file_name = os.path.join(application_path</span><span class="s2">, </span><span class="s4">&quot;models/&quot; </span><span class="s1">+ self.model_file_edit.text() + </span><span class="s4">&quot;.txt&quot;</span><span class="s1">)</span>
+            <span class="s1">generated_model_file_name = generated_model_file_name.replace(</span><span class="s4">&quot; &quot;</span><span class="s2">, </span><span class="s4">&quot;-&quot;</span><span class="s1">)</span>
+
+            <span class="s3"># Display the file</span>
+            <span class="s1">display_kgml(self.kgml_file_name</span><span class="s2">,</span>
+                         <span class="s1">self.model_file_name</span><span class="s2">,</span>
+                         <span class="s1">self.toggle_generate_model_button.isChecked()</span><span class="s2">,</span>
+                         <span class="s1">generated_model_file_name)</span>
+
+    <span class="s2">def </span><span class="s1">choose_kgml_file(self):</span>
+        <span class="s0">&quot;&quot;&quot;Opens a file dialog to be able to choose the base kgml file&quot;&quot;&quot;</span>
+        <span class="s3">#  Determine if application is a script file or frozen exe</span>
+        <span class="s1">application_path = os.getcwd()</span>
+        <span class="s2">if </span><span class="s1">getattr(sys</span><span class="s2">, </span><span class="s4">'frozen'</span><span class="s2">, False</span><span class="s1">):</span>
+            <span class="s1">application_path = os.path.dirname(sys.executable)</span>
+        <span class="s2">elif </span><span class="s1">__file__:</span>
+            <span class="s1">application_path = os.path.dirname(__file__)</span>
+        <span class="s3"># Open a file dialog to select a KGML file</span>
+        <span class="s1">self.kgml_file_name</span><span class="s2">, </span><span class="s1">_ = QFileDialog.getOpenFileName(self</span><span class="s2">,</span>
+                                                             <span class="s4">&quot;Open a KGML XML File&quot;</span><span class="s2">,</span>
+                                                             <span class="s1">application_path + </span><span class="s4">&quot;/kgml_files&quot;</span><span class="s2">,</span>
+                                                             <span class="s4">&quot;XML Files (*.xml)&quot;</span><span class="s1">)</span>
+        <span class="s2">if </span><span class="s1">self.kgml_file_name == </span><span class="s4">&quot;&quot;</span><span class="s1">:</span>
+            <span class="s3"># If dialog is canceled, don't change the current value</span>
+            <span class="s1">self.kgml_file_name = self.old_kgml_file_name</span>
+        <span class="s2">else</span><span class="s1">:</span>
+            <span class="s3"># Change the KGML file to the selected value</span>
+            <span class="s1">self.old_kgml_file_name = self.kgml_file_name</span>
+            <span class="s1">self.choose_kgml_file_button.setStyleSheet(</span><span class="s4">&quot;background-color : lightgreen&quot;</span><span class="s1">)</span>
+        <span class="s1">self.kgml_path_text.setText(</span><span class="s4">&quot;KGML Path: --&quot; </span><span class="s1">+ self.kgml_file_name)</span>
+
+    <span class="s2">def </span><span class="s1">choose_model_file(self):</span>
+        <span class="s0">&quot;&quot;&quot;Opens a file dialog to be able to choose a model file&quot;&quot;&quot;</span>
+        <span class="s2">if </span><span class="s1">self.model_file_name == </span><span class="s4">&quot;&quot;</span><span class="s1">:</span>
+            <span class="s3">#  Determine if application is a script file or frozen exe</span>
+            <span class="s1">application_path = os.getcwd()</span>
+            <span class="s2">if </span><span class="s1">getattr(sys</span><span class="s2">, </span><span class="s4">'frozen'</span><span class="s2">, False</span><span class="s1">):</span>
+                <span class="s1">application_path = os.path.dirname(sys.executable)</span>
+            <span class="s2">elif </span><span class="s1">__file__:</span>
+                <span class="s1">application_path = os.path.dirname(__file__)</span>
+            <span class="s3"># If you don't have a current model file, open file dialog to choose one</span>
+            <span class="s1">self.model_file_name</span><span class="s2">, </span><span class="s1">_ = QFileDialog.getOpenFileName(self</span><span class="s2">,</span>
+                                                                  <span class="s4">&quot;Open a Network Model File&quot;</span><span class="s2">,</span>
+                                                                  <span class="s1">application_path + </span><span class="s4">&quot;/models&quot;</span><span class="s2">,</span>
+                                                                  <span class="s4">&quot;TXT Files (*.txt)&quot;</span><span class="s1">)</span>
+            <span class="s2">if </span><span class="s1">self.model_file_name != </span><span class="s4">&quot;&quot;</span><span class="s1">:</span>
+                <span class="s3"># If a file is selected, change the button to indicate that a model is chosen</span>
+                <span class="s1">self.choose_model_file_button.setStyleSheet(</span><span class="s4">&quot;background-color : lightgreen&quot;</span><span class="s1">)</span>
+        <span class="s2">else</span><span class="s1">:</span>
+            <span class="s3"># If a current model file exists, clear the current model file</span>
+            <span class="s1">self.model_file_name = </span><span class="s4">&quot;&quot;</span>
+            <span class="s1">self.choose_model_file_button.setStyleSheet(</span><span class="s4">&quot;background-color : lightgrey&quot;</span><span class="s1">)</span>
+        <span class="s1">self.model_path_text.setText(</span><span class="s4">&quot;Model Path: --&quot; </span><span class="s1">+ self.model_file_name)</span>
+
+
+<span class="s3"># Run the app</span>
+<span class="s2">if </span><span class="s1">__name__ == </span><span class="s4">&quot;__main__&quot;</span><span class="s1">:</span>
+    <span class="s1">app = QApplication([])</span>
+
+    <span class="s1">widget = MyWidget()</span>
+    <span class="s1">widget.resize(</span><span class="s5">700</span><span class="s2">, </span><span class="s5">200</span><span class="s1">)</span>
+    <span class="s1">widget.show()</span>
+
+    <span class="s1">sys.exit(app.exec())</span>
+</pre>
+</body>
+</html>
