@@ -10,7 +10,7 @@ Youtube Video Demonstrating Usage: https://youtu.be/3PZeMNfBEcc
 Usage Image:
 <img width="1190" alt="Screenshot 2023-06-18 at 11 57 20 PM" src="https://github.com/TheIshanD/Metabolic-Model-Maker/assets/56279050/a58b5e0c-759d-4121-9e33-21c382038d2f">
 
-##  The nature of the project:
+## The Nature of the Project:
 
 My project is the Metabolic Model Maker (M3). Its primary purpose is to help researchers investigate intracellular processes to discover quantitative relationships between biological molecules and propose novel mechanisms to affect these processes given the model. Using my project, researchers can adjust the strength, effect, and types of relationships between biological molecules. By providing M3 with qualitative relationships (activation, expression, inhibition, repression, methylation, etc.) between genes, proteins, and structures, the project automatically creates a structure that mimics these processes. Then, after creating a base model for the cell, users can manually shift the strength and effect of these relationships. Within the program, users can simulate how this model, which the user has created, can affect the future makeup of the cell--computing values based on the quantitative values the user has applied to qualitative relationships. Users can then export this model that they have created into a .txt format which is easy to read and parse. Using this exported format, users are then free to use the model for any use they please. For example, they can send it to others, use it in other programs, or use it as data for analysis. Users can also simply plug it back into the M3 and it will reload the biological structure with the quantitative attributes that the model file describes. 
 
