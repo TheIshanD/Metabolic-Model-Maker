@@ -10,13 +10,20 @@ Youtube Video Demonstrating Usage: https://youtu.be/3PZeMNfBEcc
 Usage Image:
 <img width="1190" alt="Screenshot 2023-06-18 at 11 57 20 PM" src="https://github.com/TheIshanD/Metabolic-Model-Maker/assets/56279050/a58b5e0c-759d-4121-9e33-21c382038d2f">
 
+## Download Tutorial
+
+Download and open the dist directory.
+Open the MetabolismModelMaker folder.
+Run the 'MetabolismModelMaker' executable file
+The Breast Cancer KGML file comes pre-installed (along with a breast cancer model)
+
 ## Usage Tutorial
 
 Upon starting the application...
 
 Press choose KGML file, then choose a KGML file from your file directory upon which the structure will be modeled.
 
-If you want to generate a model using this generator/simulation when you close it, which can be sent to others and created using the program, click the button to generate the model.
+If you want to generate a model, which can be sent to others and created using the program, click the button to generate the model.
 
 If you want to render the KGML file with pre-established values, weights, biases, and relationships, as specified by a model, then you can choose a model to generate off of.
 
@@ -25,6 +32,10 @@ When you have configured all your desired settings, run the simulation and watch
 Press [Space] to propagate all values forward in the network according to the weights, biases, inputs, and activation functions. The brightness of any neuron will adjust to proportionally match the value of the neuron to help you visually understand the underlying processes.
 
 Click on any neuron to open the left side panel where you can see and edit its properties. The information at the top describes the current neuron's properties while the tabbed information describes the information of the incoming neurons to the currently clicked neuron.
+
+Upon closing the simulation, if you chose to generate a model, the model will be generated in a CSV format in your desired file location. This can be manually edited or sent to others for them to simulate on their own.
+
+Enjoy!
 
 ## The Nature of the Project:
 
